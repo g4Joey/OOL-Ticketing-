@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState, use } from "react";
-import Link from "next/link";
+import React, { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import { TopAppBar } from "@/components/layout/TopAppBar";
-import { events, featuredEvent, formatCurrency, formatPrice } from "@/lib/mock-data";
+import { Event, events as defaultEvents, featuredEvent, formatCurrency, formatPrice } from "@/lib/mock-data";
+import { fetchEventById } from "@/lib/supabase/db";
+import { useAuth } from "@/lib/auth-context";
 
 export default function EventDetailsPage({
   params,
@@ -13,28 +14,85 @@ export default function EventDetailsPage({
 }) {
   const resolvedParams = use(params);
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
 
-  // Look up event from mock data or fallback to featured event
-  const event =
-    events.find((e) => e.id === resolvedParams.id) ||
-    (resolvedParams.id === featuredEvent.id ? featuredEvent : events[0]);
+  const initialEvent =
+    defaultEvents.find((e) => e.id === resolvedParams.id) ||
+    (resolvedParams.id === featuredEvent.id ? featuredEvent : defaultEvents[0]);
 
-  const [selectedTierId, setSelectedTierId] = useState<string>(
-    event.tiers[0]?.id || ""
-  );
+  const [event, setEvent] = useState<Event>(initialEvent);
   const [isAboutExpanded, setIsAboutExpanded] = useState<boolean>(false);
 
-  const selectedTier =
-    event.tiers.find((t) => t.id === selectedTierId) || event.tiers[0];
+  // Multi-tier Cart State: map of tierId -> quantity
+  const [cartTiers, setCartTiers] = useState<Record<string, number>>({
+    [initialEvent.tiers[0]?.id || "tier-1"]: 1,
+  });
+
+  useEffect(() => {
+    async function loadEvent() {
+      try {
+        const liveEvent = await fetchEventById(resolvedParams.id);
+        if (liveEvent) {
+          setEvent(liveEvent);
+          if (liveEvent.tiers.length > 0 && Object.keys(cartTiers).length === 0) {
+            setCartTiers({ [liveEvent.tiers[0].id]: 1 });
+          }
+        }
+      } catch (err) {
+        console.warn("Using initial event data:", err);
+      }
+    }
+    loadEvent();
+  }, [resolvedParams.id]);
+
+  const updateTierQuantity = (tierId: string, delta: number) => {
+    setCartTiers((prev) => {
+      const currentQty = prev[tierId] || 0;
+      const newQty = Math.max(0, Math.min(10, currentQty + delta));
+      const updated = { ...prev, [tierId]: newQty };
+      if (newQty === 0) {
+        delete updated[tierId];
+      }
+      return updated;
+    });
+  };
+
+  // Calculate total tickets and grand total across all tiers
+  const totalTicketCount = Object.values(cartTiers).reduce((sum, q) => sum + q, 0);
+
+  const totalCartPrice = Object.entries(cartTiers).reduce((sum, [tierId, qty]) => {
+    const tier = event.tiers.find((t) => t.id === tierId);
+    return sum + (tier ? tier.price * qty : 0);
+  }, 0);
+
+  // Build Cart Summary String (e.g. "1x VIP Pass, 2x General")
+  const cartSummaryLabel = Object.entries(cartTiers)
+    .filter(([_, qty]) => qty > 0)
+    .map(([tierId, qty]) => {
+      const tier = event.tiers.find((t) => t.id === tierId);
+      return `${qty}x ${tier?.tierLabel || "Ticket"}`;
+    })
+    .join(", ");
 
   const handleProceedToCheckout = () => {
-    router.push(
-      `/checkout?eventId=${event.id}&tierId=${selectedTier.id}&qty=1`
-    );
+    if (totalTicketCount === 0) {
+      alert("Please select at least 1 ticket to proceed.");
+      return;
+    }
+
+    const cartPayload = encodeURIComponent(JSON.stringify(cartTiers));
+    const checkoutUrl = `/checkout?eventId=${event.id}&cart=${cartPayload}&count=${totalTicketCount}&subtotal=${totalCartPrice}`;
+
+    // Auth Gating: If not logged in, redirect to stylish Signup page first
+    if (!isAuthenticated) {
+      router.push(`/auth/signup?redirect=${encodeURIComponent(checkoutUrl)}`);
+    } else {
+      router.push(checkoutUrl);
+    }
   };
 
   return (
-    <div className="bg-background text-on-background min-h-screen flex flex-col relative pb-28 pt-16 selection:bg-primary-container selection:text-on-primary-container">
+    <div className="bg-background text-on-background min-h-screen flex flex-col relative pb-32 pt-16 selection:bg-primary-container selection:text-on-primary-container">
       {/* Top Navigation */}
       <TopAppBar variant="task" title={event.title} showShare={true} />
 
@@ -134,7 +192,7 @@ export default function EventDetailsPage({
             <button
               type="button"
               onClick={() => setIsAboutExpanded(!isAboutExpanded)}
-              className="text-primary text-xs font-bold flex items-center gap-1 hover:text-on-primary-container transition-colors mt-2"
+              className="text-primary text-xs font-bold flex items-center gap-1 hover:text-on-primary-container transition-colors mt-2 cursor-pointer"
             >
               <span>{isAboutExpanded ? "Show Less" : "Read More"}</span>
               <span
@@ -147,108 +205,141 @@ export default function EventDetailsPage({
             </button>
           </section>
 
-          {/* Ticket Selection Area */}
-          <section className="flex flex-col gap-2.5">
+          {/* Multi-Tier Ticket Selection Area */}
+          <section className="flex flex-col gap-3">
             <div className="flex justify-between items-center mt-1">
               <h2 className="font-[family-name:var(--font-montserrat)] text-base font-bold text-on-surface">
                 Select Tickets
               </h2>
-              <span className="text-[11px] text-on-surface-variant font-medium">
-                Instant delivery to app & SMS
+              <span className="text-[11px] text-secondary font-bold">
+                Mix & match tiers
               </span>
             </div>
 
             {event.tiers.map((tier) => {
-              const isSelected = selectedTierId === tier.id;
-              return (
-                <label
-                  key={tier.id}
-                  onClick={() => setSelectedTierId(tier.id)}
-                  className="block relative cursor-pointer group"
-                >
-                  <input
-                    type="radio"
-                    name="ticket_type"
-                    value={tier.id}
-                    checked={isSelected}
-                    onChange={() => setSelectedTierId(tier.id)}
-                    className="sr-only"
-                  />
+              const qty = cartTiers[tier.id] || 0;
+              const isSelected = qty > 0;
+              const isLowStock = tier.available && tier.available < 15;
 
-                  {/* Card Body */}
-                  <div
-                    className={`bg-surface-container-lowest rounded-xl shadow-sm border-2 overflow-hidden transition-all flex ${
-                      isSelected
-                        ? "border-primary ring-1 ring-primary/20 shadow-md"
-                        : "border-outline-variant hover:border-outline"
-                    }`}
-                  >
-                    {/* Tear-off edge visual */}
-                    <div className="w-3 border-r-2 border-dashed border-outline-variant bg-surface-container flex flex-col justify-between py-2 shrink-0">
-                      <div className="w-1.5 h-1.5 rounded-full bg-background -ml-1" />
-                      <div className="w-1.5 h-1.5 rounded-full bg-background -ml-1" />
-                      <div className="w-1.5 h-1.5 rounded-full bg-background -ml-1" />
-                      <div className="w-1.5 h-1.5 rounded-full bg-background -ml-1" />
+              return (
+                <div
+                  key={tier.id}
+                  className={`bg-surface-container-lowest rounded-xl shadow-sm border-2 overflow-hidden transition-all flex ${
+                    isSelected
+                      ? "border-primary ring-1 ring-primary/20 shadow-md"
+                      : "border-outline-variant hover:border-outline"
+                  }`}
+                >
+                  {/* Tear-off edge visual */}
+                  <div className="w-3 border-r-2 border-dashed border-outline-variant bg-surface-container flex flex-col justify-between py-2 shrink-0">
+                    <div className="w-1.5 h-1.5 rounded-full bg-background -ml-1" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-background -ml-1" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-background -ml-1" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-background -ml-1" />
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex-1 p-3.5 flex flex-col relative">
+                    <div className="flex justify-between items-start mb-1">
+                      <div>
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <span className="text-[10px] font-extrabold text-tertiary uppercase tracking-wider">
+                            {tier.tierLabel}
+                          </span>
+                          {tier.available !== undefined && (
+                            <span
+                              className={`text-[9px] font-extrabold px-1.5 py-0.2 rounded-full ${
+                                isLowStock
+                                  ? "bg-error/15 text-error"
+                                  : "bg-surface-container text-on-surface-variant"
+                              }`}
+                            >
+                              {tier.available} tickets left
+                            </span>
+                          )}
+                        </div>
+                        <h3 className="font-[family-name:var(--font-montserrat)] text-sm font-bold text-on-surface">
+                          {tier.name}
+                        </h3>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-[family-name:var(--font-montserrat)] text-base font-extrabold text-on-surface">
+                          {formatPrice(tier.price, tier.currency)}
+                        </div>
+                      </div>
                     </div>
 
-                    {/* Content */}
-                    <div className="flex-1 p-3.5 flex flex-col relative">
-                      {/* Selected Checkmark */}
-                      <div className="absolute top-3 right-3 text-primary">
-                        <span
-                          className={`material-symbols-outlined text-[20px] transition-opacity ${
-                            isSelected ? "opacity-100" : "opacity-0"
-                          }`}
-                          style={{ fontVariationSettings: "'FILL' 1" }}
+                    <p className="text-xs text-on-surface-variant mb-3">
+                      {tier.description}
+                    </p>
+
+                    {/* Independent Quantity Stepper for this tier */}
+                    <div className="mt-auto pt-2 border-t border-dashed border-outline-variant/40 flex items-center justify-between">
+                      <span className="text-xs font-semibold text-on-surface-variant">
+                        {qty > 0 ? (
+                          <strong className="text-primary font-bold">
+                            {qty} × {formatPrice(tier.price)} = {formatCurrency(qty * tier.price)}
+                          </strong>
+                        ) : (
+                          "Select quantity"
+                        )}
+                      </span>
+
+                      <div className="flex items-center gap-2 bg-surface-container rounded-lg p-1 border border-outline-variant/40">
+                        <button
+                          type="button"
+                          onClick={() => updateTierQuantity(tier.id, -1)}
+                          disabled={qty <= 0}
+                          className="w-7 h-7 bg-surface-container-lowest text-on-surface rounded-md flex items-center justify-center font-bold hover:bg-surface-container-high active:scale-95 disabled:opacity-20 disabled:cursor-not-allowed transition-all cursor-pointer"
                         >
-                          check_circle
+                          <span className="material-symbols-outlined text-[16px]">
+                            remove
+                          </span>
+                        </button>
+
+                        <span className="font-[family-name:var(--font-montserrat)] text-sm font-extrabold text-on-surface min-w-[20px] text-center">
+                          {qty}
                         </span>
-                      </div>
 
-                      <div className="flex justify-between items-start mb-1 pr-6">
-                        <div>
-                          <div className="text-[10px] font-extrabold text-tertiary uppercase tracking-wider mb-0.5">
-                            {tier.tierLabel}
-                          </div>
-                          <h3 className="font-[family-name:var(--font-montserrat)] text-sm font-bold text-on-surface">
-                            {tier.name}
-                          </h3>
-                        </div>
-                        <div className="text-right">
-                          <div className="font-[family-name:var(--font-montserrat)] text-base font-extrabold text-on-surface">
-                            {formatPrice(tier.price, tier.currency)}
-                          </div>
-                        </div>
+                        <button
+                          type="button"
+                          onClick={() => updateTierQuantity(tier.id, 1)}
+                          disabled={qty >= (tier.available || 10)}
+                          className="w-7 h-7 bg-primary text-on-primary rounded-md flex items-center justify-center font-bold hover:bg-on-primary-fixed-variant active:scale-95 disabled:opacity-20 disabled:cursor-not-allowed transition-all cursor-pointer"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">
+                            add
+                          </span>
+                        </button>
                       </div>
-
-                      <p className="text-xs text-on-surface-variant pr-6">
-                        {tier.description}
-                      </p>
                     </div>
                   </div>
-                </label>
+                </div>
               );
             })}
           </section>
         </div>
       </main>
 
-      {/* Sticky Bottom Action Bar */}
+      {/* Sticky Bottom Action Bar with Combined Cart Total */}
       <div className="fixed bottom-0 left-0 right-0 z-50 glass border-t border-outline-variant px-4 py-3 shadow-[0_-4px_10px_rgba(0,0,0,0.06)] max-w-[480px] md:max-w-xl mx-auto">
         <div className="flex items-center justify-between mb-2 px-1">
-          <div className="text-xs text-on-surface-variant font-medium">
-            1x {selectedTier.tierLabel} ({selectedTier.name})
+          <div className="text-xs text-on-surface-variant font-medium truncate max-w-[220px]">
+            {totalTicketCount > 0 ? cartSummaryLabel : "Select tickets to continue"}
           </div>
           <div className="font-[family-name:var(--font-montserrat)] text-base font-black text-on-surface">
-            {formatCurrency(selectedTier.price, selectedTier.currency)}
+            {formatCurrency(totalCartPrice, "GHS")}
           </div>
         </div>
 
         <button
           onClick={handleProceedToCheckout}
-          className="w-full bg-primary-container text-on-primary-fixed font-[family-name:var(--font-montserrat)] text-sm font-bold py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 active:bg-primary-fixed-dim hover:opacity-95 transition-all shadow-md active:scale-[0.98] cursor-pointer"
+          disabled={totalTicketCount === 0}
+          className="w-full bg-primary-container text-on-primary-fixed font-[family-name:var(--font-montserrat)] text-sm font-bold py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 active:bg-primary-fixed-dim hover:opacity-95 transition-all shadow-md active:scale-[0.98] cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          <span>Proceed to Checkout</span>
+          <span>
+            {isAuthenticated ? "Proceed to Checkout" : "Sign Up & Checkout"}
+          </span>
           <span className="material-symbols-outlined text-[18px]">
             arrow_forward
           </span>

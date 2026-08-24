@@ -1,16 +1,29 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { TopAppBar } from "@/components/layout/TopAppBar";
 import { BottomNavBar } from "@/components/layout/BottomNavBar";
 import { TicketCard } from "@/components/ui/TicketCard";
 import { currentUser, activeTickets } from "@/lib/mock-data";
+import { useAuth } from "@/lib/auth-context";
 
 export default function UserDashboardPage() {
+  const { user: authUser } = useAuth();
   const [user, setUser] = useState(currentUser);
-  const [isEditing, setIsEditing] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (authUser) {
+      setUser({
+        id: authUser.id,
+        fullName: authUser.fullName,
+        avatarUrl: authUser.avatarUrl,
+        loyaltyPoints: authUser.loyaltyPoints,
+        status: authUser.status,
+      });
+    }
+  }, [authUser]);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -142,6 +155,27 @@ export default function UserDashboardPage() {
         {/* Settings List */}
         <section className="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant overflow-hidden mt-1">
           <ul className="flex flex-col divide-y divide-outline-variant/30 text-xs">
+            <li>
+              <Link
+                href="/admin"
+                className="w-full flex items-center gap-3 p-3.5 hover:bg-primary-container/20 transition-colors text-left group"
+              >
+                <span className="material-symbols-outlined text-primary text-[20px]">
+                  admin_panel_settings
+                </span>
+                <div className="flex-1">
+                  <span className="font-bold text-primary text-xs block">
+                    Admin Operations Portal
+                  </span>
+                  <span className="text-[10px] text-on-surface-variant">
+                    Create events, set categories, view audit logs
+                  </span>
+                </div>
+                <span className="material-symbols-outlined text-primary text-[18px] group-hover:translate-x-0.5 transition-transform">
+                  chevron_right
+                </span>
+              </Link>
+            </li>
             <li>
               <button
                 onClick={() => showToast("Account settings opened")}

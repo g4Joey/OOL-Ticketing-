@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Montserrat } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "@/lib/auth-context";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -24,7 +25,7 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: "VibePass — Secure Your Spot",
+    default: "VibePass — Secure Your Spot (2026)",
     template: "%s | VibePass",
   },
   description:
@@ -36,6 +37,7 @@ export const metadata: Metadata = {
     "MTN MoMo",
     "ticketing",
     "VibePass",
+    "2026 events",
   ],
   openGraph: {
     type: "website",
@@ -52,7 +54,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang="en"
@@ -65,7 +67,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
       </head>
       <body className="bg-background text-on-surface font-[family-name:var(--font-inter)] text-sm leading-[1.4] min-h-full flex flex-col">
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

@@ -1,5 +1,5 @@
-// Mock data matching Stitch screen content
-// Currency: GHS (₵) — converted from Stitch USD placeholders
+// Mock data matching Stitch screen content updated for 2026
+// Currency: GHS (₵)
 
 export interface Event {
   id: string;
@@ -63,17 +63,17 @@ export interface Order {
   status: 'paid' | 'pending' | 'cancelled';
 }
 
-// ─── Events ──────────────────────────────────────────────────────────────────
+// ─── Events (All set to 2026) ──────────────────────────────────────────────────
 
 export const events: Event[] = [
   {
-    id: 'neon-nights-2024',
-    title: 'Neon Nights Festival 2024',
+    id: 'neon-nights-2026',
+    title: 'Neon Nights Festival 2026',
     description: 'Experience the electrifying soundscape of the Neon Nights Festival. Join us for a night of immersive visuals, thumping bass, and unforgettable memories as we take over Downtown Arena. Expect special guest appearances and a state-of-the-art light show.',
     venue: 'Downtown Arena',
     venueAddress: '12 Independence Ave, Accra',
     city: 'Accra',
-    date: 'Oct 24, 2024 • 8:00 PM',
+    date: 'Fri, Oct 24, 2026 • 8:00 PM',
     doorsOpen: '6:30 PM',
     category: 'music',
     imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDLEOpLAUDmn7d6JmXVyv-Dg1H5CdocS9OuT4k7q7OAxKoA3nmjPQe7ekeCm8IoY_roaEjudpICmYMNxDNiln626__Zjij3MXu2X7jjKF4y9JzmJNauWyi6VyU_2e_PNV94nxJsD0nVUVp3uC2UzwmIUA1KcAx3MYaUU3kRveRA6N3nbHQcFxhlFuv4ul5YHdmAcFN9kEeskXNLYSNrW6yVOSrCUGMWzkcfsXQOkLXfoEmEm9H6_MNi_Q',
@@ -87,7 +87,7 @@ export const events: Event[] = [
         description: 'Includes early entry, exclusive merch bundle, and access to the VIP lounge.',
         price: 850,
         currency: 'GHS',
-        available: 50,
+        available: 12,
       },
       {
         id: 'neon-ga',
@@ -96,18 +96,18 @@ export const events: Event[] = [
         description: 'Standard entry to the festival grounds with access to all stages.',
         price: 150,
         currency: 'GHS',
-        available: 500,
+        available: 145,
       },
     ],
   },
   {
     id: 'city-vipers-metro-stars',
-    title: 'City Vipers vs. Metro Stars',
+    title: 'City Vipers vs. Metro Stars 2026',
     description: 'The rivalry continues! Watch the City Vipers take on the Metro Stars in this high-stakes championship showdown at Grand Stadium.',
     venue: 'Grand Stadium',
     venueAddress: 'Accra Sports Complex',
     city: 'Accra',
-    date: 'Nov 02, 2024 • 7:00 PM',
+    date: 'Sat, Nov 02, 2026 • 7:00 PM',
     doorsOpen: '5:30 PM',
     category: 'sports',
     imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBlDtpC2aki20xzBcTY81dwuMqcf55ehrSqBwwVKSY690g0EDWA7ro47MBzlAVK6jQtuupwAdQR1HVaYb3tQAfyHF5Og8c39LFxEm66OtCrVxqhWqhkoQVVEXtK1tWwmhLVSxi8bbaNnbDNkpIgP-sR-D-BL3hrdoI6K6w_U_c1qJHBOHTfARHj7WsyUgXtpxy-FrH9B_6Q-jNXvoSOaxkMukwrP2l1UENJUxiWKooe8tEr1bNj8vK9Kw',
@@ -121,7 +121,7 @@ export const events: Event[] = [
         description: 'Premium box seating with complimentary refreshments.',
         price: 500,
         currency: 'GHS',
-        available: 20,
+        available: 4,
       },
       {
         id: 'vipers-ga',
@@ -130,18 +130,18 @@ export const events: Event[] = [
         description: 'Standard stadium seating.',
         price: 80,
         currency: 'GHS',
-        available: 2000,
+        available: 88,
       },
     ],
   },
   {
     id: 'glass-menagerie',
-    title: 'The Glass Menagerie Revival',
+    title: 'The Glass Menagerie Revival 2026',
     description: 'A breathtaking modern revival of Tennessee Williams\' classic. Featuring an award-winning cast in an intimate theatre setting.',
     venue: 'Civic Playhouse',
     venueAddress: 'Ring Road, Accra',
     city: 'Accra',
-    date: 'Dec 15, 2024 • 7:30 PM',
+    date: 'Sun, Dec 15, 2026 • 7:30 PM',
     doorsOpen: '7:00 PM',
     category: 'arts',
     imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuADo6vT-pUdDQ8jGcKsYvhDuYAOnMEdc33zxRhm8sMQVqS1g55nszkPDv9ceucB7bZCLcEQxLxBH76N_7ZnG9tB90djtBltF6yk8podgy8pnQAuBn9CGZO5BG2a059n1n_hbDMyLM4JuYa1r-7Y9_yEIVDbhDcAku13_Tn01ZcpVLK62FpSkg2nz33L_3I-Xhwk4SadqAjbPS0FWTDFwm3Lwa8rgd51lGIFg5gd0VchbEEB7-P-vFJzCg',
@@ -155,7 +155,7 @@ export const events: Event[] = [
         description: 'Front orchestra seating with post-show meet & greet.',
         price: 600,
         currency: 'GHS',
-        available: 30,
+        available: 8,
       },
       {
         id: 'glass-standard',
@@ -164,18 +164,18 @@ export const events: Event[] = [
         description: 'Balcony and rear orchestra seating.',
         price: 200,
         currency: 'GHS',
-        available: 150,
+        available: 42,
       },
     ],
   },
   {
     id: 'laugh-out-loud-gala',
-    title: 'Laugh Out Loud Gala',
+    title: 'Laugh Out Loud Gala 2026',
     description: 'An evening of non-stop laughter featuring Ghana\'s top comedians and special international guests. Food and drinks available.',
     venue: 'The Comedy Cellar',
     venueAddress: 'Osu, Accra',
     city: 'Accra',
-    date: 'Oct 28, 2024 • 8:00 PM',
+    date: 'Mon, Oct 28, 2026 • 8:00 PM',
     doorsOpen: '7:30 PM',
     category: 'comedy',
     imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBkHjCvuJPkO5zROBj54Kdi_AUgKQrrIWJ4Th6RaUTYLqd7YdaUOj9bCY6HsPFr1Bq-6yG1i8_TdbX8Y2_uICbgDy9SXsZTQcAb_pK6EBLW-P8Qs24gSYK08okIlpx_JSWq8UoOUPH6bYuZ-RW4pD0-SzxhIfl4xNU9l7pxk9EAiePuQQDNCEW7LgPGQUfEAujHuw4Zllhr_QFdMIhlIBMIVmLNPwpfrp4ZSFv4bMMH1q8tK6FNH6M5AA',
@@ -189,7 +189,7 @@ export const events: Event[] = [
         description: 'Table for 2 with bottle service in the front row.',
         price: 400,
         currency: 'GHS',
-        available: 10,
+        available: 3,
       },
       {
         id: 'laugh-ga',
@@ -198,7 +198,7 @@ export const events: Event[] = [
         description: 'Standard seating in the comedy hall.',
         price: 60,
         currency: 'GHS',
-        available: 200,
+        available: 65,
       },
     ],
   },
@@ -206,13 +206,13 @@ export const events: Event[] = [
 
 // Detailed event for Event Details page
 export const featuredEvent: Event = {
-  id: 'midnight-city-tour',
-  title: 'Midnight City Tour',
-  description: 'Experience the electrifying soundscape of the Midnight City Tour. Join us for a night of immersive visuals, thumping bass, and unforgettable memories as we take over the Grand Arena. Expect special guest appearances and a state-of-the-art light show that will transform the venue into a pulsating wonderland of light and sound.',
+  id: 'midnight-city-tour-2026',
+  title: 'Midnight City Tour 2026',
+  description: 'Experience the electrifying soundscape of the Midnight City Tour. Join us for a night of immersive visuals, thumping bass, and unforgettable memories as we take over the Grand Arena. Expect special guest appearances and a state-of-the-art light show.',
   venue: 'Grand Arena',
   venueAddress: 'Neon District, Accra',
   city: 'Accra',
-  date: 'Friday, 8:00 PM',
+  date: 'Fri, Oct 24, 2026 • 8:00 PM',
   doorsOpen: '6:30 PM',
   category: 'music',
   imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDUPa1E539IiRzx3CqhKDq8E0evFc-yVJXafKiYRjOvuktn3irgUVif1fD_LEnnYC_ObwQdw8Ia11uxC9nhtqDhD_xkbgohD9X6fmCVsCSmPgoLMlaVYKPSXjQyirBZ-sKkMCXjn3XK9hvwY5GdSbh1z5Ee64c-jn8vc8G5p-RUH1yJOVenXX4mhU-gOtYAf7E20iLtiOIVgcmAkgSV7hvxte7tUDk57Dkkf2411D1Xh-KHgHcEwtDFGQ',
@@ -226,7 +226,7 @@ export const featuredEvent: Event = {
       description: 'Includes early entry, exclusive merch bundle, and access to the VIP lounge.',
       price: 749,
       currency: 'GHS',
-      available: 25,
+      available: 9,
     },
     {
       id: 'midnight-ga',
@@ -235,7 +235,7 @@ export const featuredEvent: Event = {
       description: 'Standard standing room access to the main arena floor.',
       price: 375,
       currency: 'GHS',
-      available: 500,
+      available: 120,
     },
   ],
 };
@@ -255,9 +255,9 @@ export const currentUser: UserProfile = {
 export const activeTickets: ActiveTicket[] = [
   {
     id: 'ticket-001',
-    eventTitle: 'Neon Nights Festival',
-    date: 'Fri, Oct 27 • 9:00 PM',
-    venue: 'The Grand Warehouse',
+    eventTitle: 'Neon Nights Festival 2026',
+    date: 'Fri, Oct 24, 2026 • 8:00 PM',
+    venue: 'Downtown Arena',
     section: 'VIP',
     row: 'A',
     seat: '12',
@@ -271,37 +271,45 @@ export const activeTickets: ActiveTicket[] = [
 
 export const sampleOrder: Order = {
   id: 'order-001',
-  reference: 'VIBE-8924-X',
-  eventTitle: 'Neon Nights Music Festival 2024',
-  date: 'Oct 24, 2024 • 8:00 PM',
-  ticketType: '2x General Admission',
+  reference: 'VIBE-8924-GH',
+  eventTitle: 'Neon Nights Music Festival 2026',
+  date: 'Oct 24, 2026 • 8:00 PM',
+  ticketType: '1x VIP Pass, 1x General Admission',
   ticketCount: 2,
-  subtotal: 300,
-  fees: 45,
-  processingFee: 4.50,
-  total: 349.50,
+  subtotal: 1000,
+  fees: 50,
+  processingFee: 2.50,
+  total: 1052.50,
   currency: 'GHS',
   status: 'paid',
 };
 
-// ─── Category icons mapping ──────────────────────────────────────────────────
+// ─── Category labels & icons mapping ─────────────────────────────────────────
+
+export const categoryLabels: Record<string, string> = {
+  music: 'Music Festival',
+  sports: 'Sports',
+  arts: 'Arts & Theatre',
+  festivals: 'Cultural Festivals',
+  comedy: 'Comedy Shows',
+};
 
 export const categoryIcons: Record<string, string> = {
-  music: 'music_note',
+  music: 'festival',
   sports: 'sports_soccer',
   arts: 'theater_comedy',
-  festivals: 'festival',
+  festivals: 'celebration',
   comedy: 'attractions',
 };
 
 // ─── Date badges for event cards ─────────────────────────────────────────────
 
 export const eventDateBadges: Record<string, { month: string; day: string }> = {
-  'neon-nights-2024': { month: 'OCT', day: '24' },
+  'neon-nights-2026': { month: 'OCT', day: '24' },
   'city-vipers-metro-stars': { month: 'NOV', day: '02' },
   'glass-menagerie': { month: 'DEC', day: '15' },
   'laugh-out-loud-gala': { month: 'OCT', day: '28' },
-  'midnight-city-tour': { month: 'OCT', day: '24' },
+  'midnight-city-tour-2026': { month: 'OCT', day: '24' },
 };
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────

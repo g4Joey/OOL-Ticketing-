@@ -1,27 +1,43 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { TopAppBar } from "@/components/layout/TopAppBar";
 import { BottomNavBar } from "@/components/layout/BottomNavBar";
 import { CategoryChip } from "@/components/ui/CategoryChip";
 import { EventCard } from "@/components/ui/EventCard";
-import { events, categoryIcons } from "@/lib/mock-data";
+import { Event, events as defaultEvents, categoryIcons, categoryLabels } from "@/lib/mock-data";
+import { fetchAllEvents } from "@/lib/supabase/db";
 
 const categories = [
   { id: "all", label: "All Events", icon: "confirmation_number" },
-  { id: "music", label: "Music", icon: categoryIcons.music },
+  { id: "music", label: "Music Festival", icon: categoryIcons.music },
   { id: "sports", label: "Sports", icon: categoryIcons.sports },
-  { id: "arts", label: "Arts", icon: categoryIcons.arts },
-  { id: "festivals", label: "Festivals", icon: categoryIcons.festivals },
+  { id: "arts", label: "Arts & Theatre", icon: categoryIcons.arts },
+  { id: "festivals", label: "Cultural Festivals", icon: categoryIcons.festivals },
   { id: "comedy", label: "Comedy", icon: categoryIcons.comedy },
 ];
 
 export default function DiscoveryHubPage() {
+  const [allEvents, setAllEvents] = useState<Event[]>(defaultEvents);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
 
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const liveEvents = await fetchAllEvents();
+        if (liveEvents && liveEvents.length > 0) {
+          setAllEvents(liveEvents);
+        }
+      } catch (err) {
+        console.warn("Using local events data:", err);
+      }
+    }
+    loadData();
+  }, []);
+
   const filteredEvents = useMemo(() => {
-    return events.filter((event) => {
+    return allEvents.filter((event) => {
       const matchesCategory =
         selectedCategory === "all" || event.category === selectedCategory;
       const matchesSearch =
@@ -31,11 +47,11 @@ export default function DiscoveryHubPage() {
         event.city.toLowerCase().includes(searchQuery.toLowerCase());
       return matchesCategory && matchesSearch;
     });
-  }, [selectedCategory, searchQuery]);
+  }, [allEvents, selectedCategory, searchQuery]);
 
   return (
     <div className="bg-background text-on-background min-h-screen flex flex-col pb-24 md:pb-8 pt-16 selection:bg-primary-container selection:text-on-primary-container">
-      {/* Top App Bar */}
+      {/* Top App Bar with interactive Profile menu */}
       <TopAppBar variant="shell" />
 
       <main className="w-full max-w-[1200px] mx-auto md:px-4 flex-grow">
@@ -62,7 +78,7 @@ export default function DiscoveryHubPage() {
                 >
                   verified
                 </span>
-                <span>10+ Years Trusted</span>
+                <span>2026 Official Tickets</span>
               </div>
               <div className="flex items-center gap-1.5 bg-secondary/85 backdrop-blur-md text-on-secondary px-3 py-1 rounded-full border border-secondary-fixed/30 text-[11px] font-semibold tracking-wider uppercase shadow-sm">
                 <span
@@ -88,7 +104,7 @@ export default function DiscoveryHubPage() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search artists, venues, sports..."
+                placeholder="Search music festivals, sports, comedy, venues..."
                 className="w-full h-12 md:h-14 pl-12 pr-10 bg-surface rounded-xl border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary-container/50 text-sm md:text-base text-on-surface placeholder:text-on-surface-variant transition-all shadow-md focus:outline-none"
               />
               {searchQuery && (
@@ -123,8 +139,8 @@ export default function DiscoveryHubPage() {
           <div className="flex justify-between items-center mb-3">
             <h3 className="font-[family-name:var(--font-montserrat)] text-lg md:text-xl font-bold text-on-surface">
               {selectedCategory === "all"
-                ? "Trending Now"
-                : `${categories.find((c) => c.id === selectedCategory)?.label} Events`}
+                ? "Trending 2026 Events"
+                : `${categories.find((c) => c.id === selectedCategory)?.label} in Ghana`}
             </h3>
             <span className="text-xs text-on-surface-variant font-medium">
               {filteredEvents.length} {filteredEvents.length === 1 ? "event" : "events"}
@@ -145,7 +161,7 @@ export default function DiscoveryHubPage() {
                   setSelectedCategory("all");
                   setSearchQuery("");
                 }}
-                className="mt-3 text-primary text-xs font-bold underline"
+                className="mt-3 text-primary text-xs font-bold underline cursor-pointer"
               >
                 Reset filters
               </button>
