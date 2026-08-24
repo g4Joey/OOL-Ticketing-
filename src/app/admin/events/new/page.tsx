@@ -25,7 +25,7 @@ export default function CreateEventAdminPage() {
   const [venue, setVenue] = useState("");
   const [venueAddress, setVenueAddress] = useState("");
   const [city, setCity] = useState("Accra");
-  const [dateDisplay, setDateDisplay] = useState("Sat, Dec 21, 2024 • 8:00 PM");
+  const [dateDisplay, setDateDisplay] = useState("Sat, Dec 21, 2026 • 8:00 PM");
   const [doorsOpen, setDoorsOpen] = useState("6:30 PM");
   const [description, setDescription] = useState("");
   const [imageUrl, setImageUrl] = useState(
@@ -175,7 +175,7 @@ export default function CreateEventAdminPage() {
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="e.g. AfroFuture Festival 2024"
+                  placeholder="e.g. AfroFuture Festival 2026"
                   required
                   className="w-full bg-surface border border-outline-variant rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
                 />
@@ -250,7 +250,7 @@ export default function CreateEventAdminPage() {
                     type="text"
                     value={dateDisplay}
                     onChange={(e) => setDateDisplay(e.target.value)}
-                    placeholder="Fri, Oct 24, 2024 • 8:00 PM"
+                    placeholder="Fri, Oct 24, 2026 • 8:00 PM"
                     required
                     className="w-full bg-surface border border-outline-variant rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
                   />

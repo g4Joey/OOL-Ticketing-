@@ -156,7 +156,7 @@ export async function recordSuccessfulOrder(orderData: {
       order_id: order?.id,
       event_title: orderData.eventTitle,
       tier_label: orderData.ticketType,
-      date_display: "Fri, Oct 24, 2024 • 8:00 PM",
+      date_display: "Fri, Oct 24, 2026 • 8:00 PM",
       venue: "Grand Arena, Accra",
       section: "VIP",
       row: "A",
