@@ -1,26 +1,155 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
+/* ─── Design System Tokens (from Stitch) ─────────────────────────────── */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Fonts */
+  --font-inter: "Inter", sans-serif;
+  --font-montserrat: "Montserrat", sans-serif;
+
+  /* Colors — Material Design 3 Semantic Palette */
+  --color-primary: #006b57;
+  --color-primary-container: #00ffd1;
+  --color-primary-fixed: #15ffd1;
+  --color-primary-fixed-dim: #00e0b7;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #00725c;
+  --color-on-primary-fixed: #002019;
+  --color-on-primary-fixed-variant: #005141;
+  --color-inverse-primary: #00e0b7;
+
+  --color-secondary: #3b6751;
+  --color-secondary-container: #bbeacf;
+  --color-secondary-fixed: #bdedd2;
+  --color-secondary-fixed-dim: #a2d1b7;
+  --color-on-secondary: #ffffff;
+  --color-on-secondary-container: #406b56;
+  --color-on-secondary-fixed: #002113;
+  --color-on-secondary-fixed-variant: #234f3b;
+
+  --color-tertiary: #006e2f;
+  --color-tertiary-container: #6afe8f;
+  --color-tertiary-fixed: #6bff8f;
+  --color-tertiary-fixed-dim: #4ae176;
+  --color-on-tertiary: #ffffff;
+  --color-on-tertiary-container: #007432;
+  --color-on-tertiary-fixed: #002109;
+  --color-on-tertiary-fixed-variant: #005321;
+
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-on-error: #ffffff;
+  --color-on-error-container: #93000a;
+
+  --color-surface: #f7f9fb;
+  --color-surface-dim: #d8dadc;
+  --color-surface-bright: #f7f9fb;
+  --color-surface-container: #eceef0;
+  --color-surface-container-low: #f2f4f6;
+  --color-surface-container-high: #e6e8ea;
+  --color-surface-container-highest: #e0e3e5;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-variant: #e0e3e5;
+  --color-surface-tint: #006b57;
+  --color-on-surface: #191c1e;
+  --color-on-surface-variant: #3a4a44;
+  --color-inverse-surface: #2d3133;
+  --color-inverse-on-surface: #eff1f3;
+
+  --color-background: #f7f9fb;
+  --color-on-background: #191c1e;
+  --color-outline: #6a7b74;
+  --color-outline-variant: #b9cbc3;
+
+  /* Spacing */
+  --spacing-stack-gap: 0.75rem;
+  --spacing-section-padding: 1.5rem;
+  --spacing-container-margin: 1rem;
+  --spacing-component-padding-x: 1rem;
+  --spacing-component-padding-y: 0.75rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ─── Base ────────────────────────────────────────────────────────────── */
+body {
+  min-height: max(884px, 100dvh);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Scrollbar Hiding ────────────────────────────────────────────────── */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ─── Ticket Tear-off Effects ─────────────────────────────────────────── */
+.ticket-tear {
+  position: relative;
+}
+.ticket-tear::before,
+.ticket-tear::after {
+  content: "";
+  position: absolute;
+  top: -6px;
+  width: 12px;
+  height: 12px;
+  background-color: var(--color-background);
+  border-radius: 50%;
+}
+.ticket-tear::before {
+  left: -6px;
+}
+.ticket-tear::after {
+  right: -6px;
+}
+.ticket-border {
+  border-top: 1px dashed var(--color-outline-variant);
+}
+.ticket-dash {
+  border-bottom: 2px dashed #e2e8f0;
+}
+
+/* ─── Glassmorphism ───────────────────────────────────────────────────── */
+.glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ─── Payment Radio Custom ────────────────────────────────────────────── */
+.radio-custom:checked + div {
+  border-color: var(--color-primary-container);
+  background-color: var(--color-surface-container-low);
+}
+.radio-custom:checked + div .check-icon {
+  opacity: 1;
+}
+
+/* ─── Material Symbols Defaults ───────────────────────────────────────── */
+.material-symbols-outlined {
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+.material-symbols-outlined.fill {
+  font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+
+/* ─── Confetti Animation (Screen 6) ───────────────────────────────────── */
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
   }
 }
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.confetti-piece {
+  position: fixed;
+  top: -10px;
+  animation: confetti-fall 3s ease-in-out forwards;
+  pointer-events: none;
+  z-index: 100;
 }
