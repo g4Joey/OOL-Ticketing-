@@ -245,29 +245,16 @@ export const featuredEvent: Event = {
 // ─── User ────────────────────────────────────────────────────────────────────
 
 export const currentUser: UserProfile = {
-  id: 'user-001',
-  fullName: 'Alex Mercer',
-  avatarUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCEdsNPxJ_IEXGM_Gz1qnunI9Fer_IjbVZ-ybhSyF2ZBF-JcsHtqcgThyhpxRhpm5JVs1W8naMVAg4RiKaXnBZmJi2k3iq7_l9guafvaAqE0gQhnp-ts74APGtprOLZWo1HXITinrqRLj6Dg1iOi0LC8FwVxSENKcOoHkGeDEsljKQv5-OwMAgeZqvcg6Rq9aAIuCfZmcvB0BhHPODiJ79YZeneAPYM1ABeyarAQQje28xsHozJV_tu_Q',
-  loyaltyPoints: 2450,
-  status: 'insider',
+  id: '',
+  fullName: '',
+  avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
+  loyaltyPoints: 0,
+  status: 'member',
 };
 
 // ─── Active Tickets ──────────────────────────────────────────────────────────
 
-export const activeTickets: ActiveTicket[] = [
-  {
-    id: 'ticket-001',
-    eventTitle: 'Neon Nights Festival 2026',
-    date: 'Fri, Oct 24, 2026 • 8:00 PM',
-    venue: 'Downtown Arena',
-    section: 'VIP',
-    row: 'A',
-    seat: '12',
-    tierLabel: 'VIP Pass',
-    isVerified: true,
-    isTonight: true,
-  },
-];
+export const activeTickets: ActiveTicket[] = [];
 
 // ─── Orders ──────────────────────────────────────────────────────────────────
 

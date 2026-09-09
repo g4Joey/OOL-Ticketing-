@@ -1,11 +1,22 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
 
 export const WelcomePage: React.FC = () => {
+  useEffect(() => {
+    const originalHtmlBg = document.documentElement.style.backgroundColor;
+    const originalBodyBg = document.body.style.backgroundColor;
+    document.documentElement.style.backgroundColor = "#006b57";
+    document.body.style.backgroundColor = "#006b57";
+    return () => {
+      document.documentElement.style.backgroundColor = originalHtmlBg;
+      document.body.style.backgroundColor = originalBodyBg;
+    };
+  }, []);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary via-secondary to-tertiary flex flex-col items-center justify-center relative overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
+    <div className="min-h-[100dvh] w-full flex-1 bg-gradient-to-br from-primary via-secondary to-tertiary flex flex-col items-center justify-center relative overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
       {/* Animated Background Orbs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-32 -left-32 w-96 h-96 bg-primary-container/30 rounded-full blur-3xl animate-pulse" />

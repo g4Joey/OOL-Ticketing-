@@ -1,8 +1,4 @@
--- ==============================================================================
--- VIBEPASS SUPABASE DATABASE SCHEMA (2026 RELEASE)
--- Run this in your Supabase SQL Editor:
--- https://supabase.com/dashboard/project/rlobdamkovasoaijiisk/sql/new
--- ==============================================================================
+
 
 -- 1. PROFILES TABLE
 CREATE TABLE IF NOT EXISTS public.profiles (
@@ -162,6 +158,16 @@ DROP POLICY IF EXISTS "Public can view admin logs" ON public.admin_logs;
 DROP POLICY IF EXISTS "Public can insert admin logs" ON public.admin_logs;
 
 -- Re-create permissive policies for seamless application execution
+DROP POLICY IF EXISTS "Public can view profiles" ON public.profiles;
+DROP POLICY IF EXISTS "Public can insert profiles" ON public.profiles;
+DROP POLICY IF EXISTS "Public can update profiles" ON public.profiles;
+DROP POLICY IF EXISTS "Public can delete profiles" ON public.profiles;
+
+CREATE POLICY "Public can view profiles" ON public.profiles FOR SELECT USING (true);
+CREATE POLICY "Public can insert profiles" ON public.profiles FOR INSERT WITH CHECK (true);
+CREATE POLICY "Public can update profiles" ON public.profiles FOR UPDATE USING (true);
+CREATE POLICY "Public can delete profiles" ON public.profiles FOR DELETE USING (true);
+
 CREATE POLICY "Public can view all events" ON public.events FOR SELECT USING (true);
 CREATE POLICY "Public can insert events" ON public.events FOR INSERT WITH CHECK (true);
 CREATE POLICY "Public can update events" ON public.events FOR UPDATE USING (true);
@@ -188,6 +194,18 @@ DROP POLICY IF EXISTS "Public can update resale listings" ON public.resale_listi
 CREATE POLICY "Public can view resale listings" ON public.resale_listings FOR SELECT USING (true);
 CREATE POLICY "Public can insert resale listings" ON public.resale_listings FOR INSERT WITH CHECK (true);
 CREATE POLICY "Public can update resale listings" ON public.resale_listings FOR UPDATE USING (true);
+
+-- ==============================================================================
+-- 9. PERMISSIONS & GRANTS (Fixes 'permission denied for table events')
+-- ==============================================================================
+GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role;
+GRANT ALL ON ALL TABLES IN SCHEMA public TO anon, authenticated, service_role;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated, service_role;
+GRANT ALL ON ALL ROUTINES IN SCHEMA public TO anon, authenticated, service_role;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON ROUTINES TO anon, authenticated, service_role;
 
 -- ==============================================================================
 -- SEED DATA (2026 EVENTS & TIERS)

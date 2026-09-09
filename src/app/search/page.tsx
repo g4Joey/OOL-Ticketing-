@@ -149,70 +149,88 @@ export default function SearchPage() {
           </div>
         </section>
 
-        {/* Recent Searches (shown when no query) */}
-        {!searchQuery && (
-          <section className="mb-4">
-            <h3 className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">
-              Popular Searches
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {recentSearches.map((term) => (
-                <button
-                  key={term}
-                  onClick={() => setSearchQuery(term)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-surface-container-lowest rounded-full border border-outline-variant/60 text-xs font-medium text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all active:scale-95"
-                >
-                  <span className="material-symbols-outlined text-[14px]">history</span>
-                  <span>{term}</span>
-                </button>
-              ))}
+        {/* Search Landing State (when no query is entered yet) */}
+        {!searchQuery.trim() ? (
+          <section className="py-6 flex flex-col items-center justify-center text-center">
+            {/* Popular Searches */}
+            <div className="w-full mb-6">
+              <h3 className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2.5 text-left">
+                Popular Searches
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {recentSearches.map((term) => (
+                  <button
+                    key={term}
+                    onClick={() => setSearchQuery(term)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-surface-container-lowest rounded-full border border-outline-variant/60 text-xs font-medium text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all active:scale-95 shadow-sm"
+                  >
+                    <span className="material-symbols-outlined text-[14px] text-primary">trending_up</span>
+                    <span>{term}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Empty State Prompt */}
+            <div className="bg-surface-container-lowest/80 rounded-2xl p-8 border border-outline-variant/40 w-full max-w-md my-4 shadow-sm flex flex-col items-center">
+              <div className="w-16 h-16 rounded-2xl bg-primary-container/30 text-primary flex items-center justify-center mb-3">
+                <span className="material-symbols-outlined text-[32px]">
+                  manage_search
+                </span>
+              </div>
+              <h2 className="font-[family-name:var(--font-montserrat)] text-base font-bold text-on-surface">
+                Search 2026 Events in Ghana
+              </h2>
+              <p className="text-xs text-on-surface-variant mt-1.5 max-w-xs leading-relaxed">
+                Start typing an event name, venue (e.g. &ldquo;Grand Stadium&rdquo;), or city to see live results as you type.
+              </p>
             </div>
           </section>
-        )}
-
-        {/* Search Results */}
-        <section className="pb-6">
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="font-[family-name:var(--font-montserrat)] text-base font-bold text-on-surface">
-              {searchQuery ? `Results for "${searchQuery}"` : "All Events"}
-            </h3>
-            <span className="text-xs text-on-surface-variant font-medium">
-              {filteredEvents.length} {filteredEvents.length === 1 ? "event" : "events"}
-            </span>
-          </div>
-
-          {filteredEvents.length === 0 ? (
-            <div className="bg-surface-container-lowest rounded-xl p-8 text-center border border-outline-variant/50 my-6">
-              <span className="material-symbols-outlined text-4xl text-on-surface-variant opacity-60 mb-2">
-                event_busy
+        ) : (
+          /* Active Live Search Results */
+          <section className="pb-6">
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="font-[family-name:var(--font-montserrat)] text-base font-bold text-on-surface">
+                Results for &ldquo;{searchQuery}&rdquo;
+              </h3>
+              <span className="text-xs text-primary font-bold">
+                {filteredEvents.length} {filteredEvents.length === 1 ? "match" : "matches"} found
               </span>
-              <p className="font-bold text-on-surface">No events found</p>
-              <p className="text-xs text-on-surface-variant mt-1">
-                {searchMode === "venue"
-                  ? "Try a different venue name or switch to a broader search mode."
-                  : searchMode === "city"
-                  ? "No events in this city. Try searching by event name instead."
-                  : "Try searching with a different keyword or category."}
-              </p>
-              <button
-                onClick={() => {
-                  setSearchQuery("");
-                  setSelectedCategory("all");
-                  setSearchMode("name");
-                }}
-                className="mt-3 text-primary text-xs font-bold underline cursor-pointer"
-              >
-                Clear all filters
-              </button>
             </div>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-              {filteredEvents.map((event) => (
-                <EventCard key={event.id} event={event} />
-              ))}
-            </div>
-          )}
-        </section>
+
+            {filteredEvents.length === 0 ? (
+              <div className="bg-surface-container-lowest rounded-xl p-8 text-center border border-outline-variant/50 my-6">
+                <span className="material-symbols-outlined text-4xl text-on-surface-variant opacity-60 mb-2">
+                  event_busy
+                </span>
+                <p className="font-bold text-on-surface">No events found</p>
+                <p className="text-xs text-on-surface-variant mt-1">
+                  {searchMode === "venue"
+                    ? "Try a different venue name or switch to a broader search mode."
+                    : searchMode === "city"
+                    ? "No events in this city. Try searching by event name instead."
+                    : "Try searching with a different keyword or category."}
+                </p>
+                <button
+                  onClick={() => {
+                    setSearchQuery("");
+                    setSelectedCategory("all");
+                    setSearchMode("name");
+                  }}
+                  className="mt-3 text-primary text-xs font-bold underline cursor-pointer"
+                >
+                  Clear search
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 animate-in fade-in duration-200">
+                {filteredEvents.map((event) => (
+                  <EventCard key={event.id} event={event} />
+                ))}
+              </div>
+            )}
+          </section>
+        )}
       </main>
 
       <BottomNavBar />

@@ -69,8 +69,8 @@
 }
 
 /* ─── Base ────────────────────────────────────────────────────────────── */
-body {
-  min-height: max(884px, 100dvh);
+html, body {
+  min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

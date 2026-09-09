@@ -8,6 +8,7 @@ import { BottomNavBar } from "@/components/layout/BottomNavBar";
 import { useAuth } from "@/lib/auth-context";
 import { useResale } from "@/lib/resale-context";
 import { activeTickets, ActiveTicket, formatCurrency } from "@/lib/mock-data";
+import { QRModal } from "@/components/ui/QRModal";
 
 export default function TicketsPage() {
   const router = useRouter();
@@ -17,6 +18,7 @@ export default function TicketsPage() {
   const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState<"upcoming" | "past">("upcoming");
   const [resaleModalTicket, setResaleModalTicket] = useState<ActiveTicket | null>(null);
+  const [selectedQRModalTicket, setSelectedQRModalTicket] = useState<ActiveTicket | null>(null);
   const [askingPrice, setAskingPrice] = useState<string>("");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -274,7 +276,10 @@ export default function TicketsPage() {
                   <div className="px-4 py-3 flex items-center gap-2">
                     {!isPast && (
                       <>
-                        <button className="flex-1 flex items-center justify-center gap-1.5 bg-primary text-on-primary py-2 rounded-lg text-xs font-bold transition-all hover:bg-on-primary-fixed-variant active:scale-95 shadow-sm">
+                        <button
+                          onClick={() => setSelectedQRModalTicket(ticket)}
+                          className="flex-1 flex items-center justify-center gap-1.5 bg-primary text-on-primary py-2 rounded-lg text-xs font-bold transition-all hover:bg-on-primary-fixed-variant active:scale-95 shadow-sm cursor-pointer"
+                        >
                           <span className="material-symbols-outlined text-[16px]">qr_code_2</span>
                           Show QR
                         </button>
@@ -284,7 +289,7 @@ export default function TicketsPage() {
                               setResaleModalTicket(ticket);
                               setAskingPrice("150");
                             }}
-                            className="flex-1 flex items-center justify-center gap-1.5 bg-surface-container text-on-surface py-2 rounded-lg text-xs font-bold border border-outline-variant transition-all hover:bg-surface-container-high active:scale-95"
+                            className="flex-1 flex items-center justify-center gap-1.5 bg-surface-container text-on-surface py-2 rounded-lg text-xs font-bold border border-outline-variant transition-all hover:bg-surface-container-high active:scale-95 cursor-pointer"
                           >
                             <span className="material-symbols-outlined text-[16px]">sell</span>
                             List for Resale
@@ -306,10 +311,10 @@ export default function TicketsPage() {
         )}
       </main>
 
-      {/* Resale Modal */}
+      {/* Resale Modal (Elevated with z-[70] and centered so footer never covers buttons) */}
       {resaleModalTicket && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-on-surface/50 backdrop-blur-sm p-4">
-          <div className="bg-surface-container-lowest rounded-2xl shadow-2xl w-full max-w-md border border-outline-variant/60 animate-in slide-in-from-bottom-4 duration-300">
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-on-surface/60 backdrop-blur-sm p-4 overflow-y-auto">
+          <div className="bg-surface-container-lowest rounded-2xl shadow-2xl w-full max-w-md border border-outline-variant/60 animate-in zoom-in-95 duration-200 my-auto">
             {/* Modal Header */}
             <div className="px-5 py-4 border-b border-outline-variant/40 flex items-center justify-between">
               <h3 className="font-[family-name:var(--font-montserrat)] text-base font-bold text-on-surface">
@@ -373,20 +378,36 @@ export default function TicketsPage() {
                   setResaleModalTicket(null);
                   setAskingPrice("");
                 }}
-                className="flex-1 py-2.5 rounded-xl text-xs font-bold text-on-surface-variant bg-surface-container border border-outline-variant hover:bg-surface-container-high transition-colors"
+                className="flex-1 py-2.5 rounded-xl text-xs font-bold text-on-surface-variant bg-surface-container border border-outline-variant hover:bg-surface-container-high transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={handleListForResale}
                 disabled={!askingPrice || parseFloat(askingPrice) <= 0}
-                className="flex-1 py-2.5 rounded-xl text-xs font-bold bg-primary text-on-primary shadow-md hover:bg-on-primary-fixed-variant transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 py-2.5 rounded-xl text-xs font-bold bg-primary text-on-primary shadow-md hover:bg-on-primary-fixed-variant transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 Submit Listing
               </button>
             </div>
           </div>
         </div>
+      )}
+
+      {/* QR Code Modal for Show QR */}
+      {selectedQRModalTicket && (
+        <QRModal
+          isOpen={!!selectedQRModalTicket}
+          onClose={() => setSelectedQRModalTicket(null)}
+          ticketData={{
+            eventTitle: selectedQRModalTicket.eventTitle,
+            section: selectedQRModalTicket.section,
+            row: selectedQRModalTicket.row,
+            seat: selectedQRModalTicket.seat,
+            date: selectedQRModalTicket.date,
+            ticketId: selectedQRModalTicket.id,
+          }}
+        />
       )}
 
       <BottomNavBar />

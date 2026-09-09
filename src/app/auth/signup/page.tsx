@@ -19,8 +19,20 @@ function SignupContent() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [enable2FA, setEnable2FA] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+
+  React.useEffect(() => {
+    const origHtml = document.documentElement.style.backgroundColor;
+    const origBody = document.body.style.backgroundColor;
+    document.documentElement.style.backgroundColor = "#006b57";
+    document.body.style.backgroundColor = "#006b57";
+    return () => {
+      document.documentElement.style.backgroundColor = origHtml;
+      document.body.style.backgroundColor = origBody;
+    };
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,6 +40,19 @@ function SignupContent() {
 
     setTimeout(() => {
       const displayName = role === "admin" && orgName ? `${fullName} (${orgName})` : fullName;
+      
+      // Save recent email and user registry in localStorage
+      if (typeof window !== "undefined") {
+        localStorage.setItem("vibepass_recent_email", email);
+        const existingRegistry = JSON.parse(localStorage.getItem("vibepass_user_registry") || "{}");
+        existingRegistry[email.toLowerCase()] = {
+          role,
+          fullName: displayName,
+          phone,
+        };
+        localStorage.setItem("vibepass_user_registry", JSON.stringify(existingRegistry));
+      }
+
       signup(email, displayName, role);
       setIsLoading(false);
       router.push(role === "admin" && redirectUrl === "/dashboard" ? "/admin" : redirectUrl);
@@ -211,14 +236,26 @@ function SignupContent() {
             <label className="block text-[11px] font-bold uppercase text-on-surface-variant mb-1">
               Create Password *
             </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              required
-              className="w-full bg-surface-container-lowest border border-outline-variant rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                className="w-full bg-surface-container-lowest border border-outline-variant rounded-xl pl-3.5 pr-10 py-2 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface p-1 focus:outline-none"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                <span className="material-symbols-outlined text-[18px]">
+                  {showPassword ? "visibility_off" : "visibility"}
+                </span>
+              </button>
+            </div>
           </div>
 
           {/* 2FA Protection */}

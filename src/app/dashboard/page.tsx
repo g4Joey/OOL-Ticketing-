@@ -9,9 +9,14 @@ import { currentUser, activeTickets } from "@/lib/mock-data";
 import { useAuth } from "@/lib/auth-context";
 
 export default function UserDashboardPage() {
-  const { user: authUser } = useAuth();
+  const { user: authUser, isAuthenticated, logout } = useAuth();
   const [user, setUser] = useState(currentUser);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (authUser) {
@@ -29,6 +34,40 @@ export default function UserDashboardPage() {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
   };
+
+  if (mounted && (!isAuthenticated || !authUser)) {
+    return (
+      <div className="bg-background text-on-background min-h-screen flex flex-col pb-24 pt-16 selection:bg-primary-container selection:text-on-primary-container">
+        <TopAppBar variant="shell" />
+        <main className="flex-1 flex flex-col items-center justify-center p-6 max-w-[440px] mx-auto w-full text-center">
+          <div className="w-16 h-16 rounded-2xl bg-surface-container text-on-surface-variant flex items-center justify-center mb-4">
+            <span className="material-symbols-outlined text-[36px]">person_off</span>
+          </div>
+          <h2 className="font-[family-name:var(--font-montserrat)] text-xl font-bold text-on-surface mb-1">
+            You Are Not Signed In
+          </h2>
+          <p className="text-xs text-on-surface-variant max-w-xs mb-6 leading-relaxed">
+            Sign in or create an account to view your active tickets, loyalty points, and profile information.
+          </p>
+          <div className="w-full flex flex-col gap-3">
+            <Link
+              href="/auth/login?redirect=/dashboard"
+              className="w-full py-3 bg-primary text-on-primary font-bold text-sm rounded-xl shadow-md hover:bg-on-primary-fixed-variant transition-all active:scale-[0.98] text-center"
+            >
+              Sign In
+            </Link>
+            <Link
+              href="/auth/signup?redirect=/dashboard"
+              className="w-full py-3 bg-primary-container text-on-primary-container font-bold text-sm rounded-xl hover:bg-primary-fixed-dim transition-all active:scale-[0.98] text-center"
+            >
+              Create Account
+            </Link>
+          </div>
+        </main>
+        <BottomNavBar />
+      </div>
+    );
+  }
 
   return (
     <div className="bg-background text-on-background min-h-screen flex flex-col pb-24 pt-16 selection:bg-primary-container selection:text-on-primary-container">
@@ -222,6 +261,25 @@ export default function UserDashboardPage() {
                   Help & 24/7 Support
                 </span>
                 <span className="material-symbols-outlined text-on-surface-variant text-[18px]">
+                  chevron_right
+                </span>
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => {
+                  logout();
+                  showToast("Signed out successfully");
+                }}
+                className="w-full flex items-center gap-3 p-3.5 hover:bg-error-container/30 transition-colors text-left text-error cursor-pointer border-t border-outline-variant/30"
+              >
+                <span className="material-symbols-outlined text-[20px] text-error">
+                  logout
+                </span>
+                <span className="flex-1 font-bold text-xs">
+                  Sign Out of VibePass
+                </span>
+                <span className="material-symbols-outlined text-[18px]">
                   chevron_right
                 </span>
               </button>
