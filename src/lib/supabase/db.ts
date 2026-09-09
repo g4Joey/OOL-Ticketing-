@@ -17,7 +17,6 @@ export async function fetchAllEvents(): Promise<Event[]> {
     const { data: dbEvents, error: eventsError } = await supabase
       .from("events")
       .select("*")
-      .eq("status", "active")
       .order("created_at", { ascending: false });
 
     if (eventsError || !dbEvents || dbEvents.length === 0) {
@@ -220,8 +219,6 @@ export async function createAdminEvent(
       image_url: eventData.imageUrl,
       is_selling_fast: eventData.isSellingFast || false,
       is_verified_seller: true,
-      created_by: adminEmail,
-      status: "active",
     });
 
     if (eventError) {
