@@ -46,11 +46,6 @@ function DiscoveryHubContent() {
     }
   }, [isBrowsing]);
 
-  // Show welcome page for unauthenticated, first-time visitors
-  if (mounted && !isAuthenticated && !skipWelcome) {
-    return <WelcomePage />;
-  }
-
   useEffect(() => {
     async function loadData() {
       try {
@@ -77,6 +72,11 @@ function DiscoveryHubContent() {
       return matchesCategory && matchesSearch;
     });
   }, [allEvents, selectedCategory, searchQuery]);
+
+  // Show welcome page for unauthenticated, first-time visitors
+  if (mounted && !isAuthenticated && !skipWelcome) {
+    return <WelcomePage />;
+  }
 
   return (
     <div className="bg-background text-on-background min-h-screen flex flex-col pb-24 md:pb-8 pt-16 selection:bg-primary-container selection:text-on-primary-container">

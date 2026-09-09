@@ -35,7 +35,7 @@ export async function fetchAllEvents(): Promise<Event[]> {
           description: t.description,
           price: Number(t.price),
           currency: t.currency || "GHS",
-          available: t.quantity - t.sold,
+          available: t.available !== undefined && t.available !== null ? Number(t.available) : Number(t.quantity || 100),
         }));
 
       return {
@@ -83,7 +83,7 @@ export async function fetchEventById(id: string): Promise<Event | null> {
       description: t.description,
       price: Number(t.price),
       currency: t.currency || "GHS",
-      available: t.quantity - t.sold,
+      available: t.available !== undefined && t.available !== null ? Number(t.available) : Number(t.quantity || 100),
     }));
 
     return {
@@ -236,7 +236,7 @@ export async function createAdminEvent(
         price: t.price,
         currency: "GHS",
         quantity: t.quantity,
-        sold: 0,
+        available: t.quantity,
       }));
 
       const { error: tiersError } = await supabase.from("ticket_tiers").insert(tierRows);
