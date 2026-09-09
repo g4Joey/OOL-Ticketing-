@@ -39,6 +39,14 @@ export const EventCard: React.FC<EventCardProps> = ({ event }) => {
             <span>Selling Fast</span>
           </div>
         )}
+
+        {/* External Partner Badge */}
+        {event.isExternalListing && (
+          <div className="absolute bottom-2 right-2 bg-tertiary text-on-tertiary px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider shadow-sm flex items-center gap-1">
+            <span className="material-symbols-outlined text-[12px]">handshake</span>
+            <span>Partner</span>
+          </div>
+        )}
       </Link>
 
       {/* Content */}
@@ -48,10 +56,17 @@ export const EventCard: React.FC<EventCardProps> = ({ event }) => {
             {event.title}
           </h4>
         </Link>
-        <p className="text-[11px] text-on-surface-variant flex items-center gap-1 mb-3">
+        <p className="text-[11px] text-on-surface-variant flex items-center gap-1 mb-1">
           <span className="material-symbols-outlined text-[12px] text-primary">location_on</span>
           <span className="truncate">{event.venue}</span>
         </p>
+        {event.isExternalListing && event.organizerName && (
+          <p className="text-[10px] text-tertiary font-bold flex items-center gap-1 mb-2">
+            <span className="material-symbols-outlined text-[11px]" style={{ fontVariationSettings: "'FILL' 1" }}>apartment</span>
+            <span className="truncate">by {event.organizerName}</span>
+          </p>
+        )}
+        {!event.isExternalListing && <div className="mb-2" />}
 
         {/* Ticket Tear Border */}
         <div className="mt-auto pt-2 ticket-border ticket-tear" />

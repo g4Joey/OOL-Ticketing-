@@ -1,13 +1,15 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { TopAppBar } from "@/components/layout/TopAppBar";
 import { BottomNavBar } from "@/components/layout/BottomNavBar";
 import { CategoryChip } from "@/components/ui/CategoryChip";
 import { EventCard } from "@/components/ui/EventCard";
 import { Event, events as defaultEvents, categoryIcons, categoryLabels } from "@/lib/mock-data";
 import { fetchAllEvents } from "@/lib/supabase/db";
-
+import { useAuth } from "@/lib/auth-context";
+import { WelcomePage } from "@/components/WelcomePage";
 const categories = [
   { id: "all", label: "All Events", icon: "confirmation_number" },
   { id: "music", label: "Music Festival", icon: categoryIcons.music },
@@ -17,10 +19,37 @@ const categories = [
   { id: "comedy", label: "Comedy", icon: categoryIcons.comedy },
 ];
 
-export default function DiscoveryHubPage() {
+function DiscoveryHubContent() {
+  const { isAuthenticated } = useAuth();
+  const searchParams = useSearchParams();
+  const isBrowsing = searchParams.get("browsing") === "true";
+
   const [allEvents, setAllEvents] = useState<Event[]>(defaultEvents);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [mounted, setMounted] = useState(false);
+  const [skipWelcome, setSkipWelcome] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    // Check if user previously chose to browse
+    if (typeof window !== "undefined") {
+      const browsed = sessionStorage.getItem("vibepass_browsing");
+      if (browsed === "true") setSkipWelcome(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isBrowsing && typeof window !== "undefined") {
+      sessionStorage.setItem("vibepass_browsing", "true");
+      setSkipWelcome(true);
+    }
+  }, [isBrowsing]);
+
+  // Show welcome page for unauthenticated, first-time visitors
+  if (mounted && !isAuthenticated && !skipWelcome) {
+    return <WelcomePage />;
+  }
 
   useEffect(() => {
     async function loadData() {
@@ -179,5 +208,13 @@ export default function DiscoveryHubPage() {
       {/* Bottom Nav Bar */}
       <BottomNavBar />
     </div>
+  );
+}
+
+export default function DiscoveryHubPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-background" />}>
+      <DiscoveryHubContent />
+    </Suspense>
   );
 }

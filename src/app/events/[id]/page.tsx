@@ -155,6 +155,23 @@ export default function EventDetailsPage({
           </div>
         </div>
 
+        {/* External Partner Banner */}
+        {event.isExternalListing && (
+          <div className="bg-tertiary/5 border-y border-tertiary/20 py-2.5 px-4 flex items-center gap-3">
+            <span className="material-symbols-outlined text-[20px] text-tertiary" style={{ fontVariationSettings: "'FILL' 1" }}>
+              handshake
+            </span>
+            <div>
+              <p className="text-xs font-bold text-on-surface">
+                Hosted by {event.organizerName || "External Partner"}
+              </p>
+              <p className="text-[10px] text-on-surface-variant">
+                This event is organized by an external partner. VibePass handles secure ticketing.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Body Container */}
         <div className="px-4 py-3 flex flex-col gap-3">
           {/* Date & Time Card */}

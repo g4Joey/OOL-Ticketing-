@@ -14,6 +14,8 @@ export interface Event {
   imageUrl: string;
   isSellingFast: boolean;
   isVerifiedSeller: boolean;
+  isExternalListing?: boolean;
+  organizerName?: string;
   tiers: TicketTier[];
 }
 

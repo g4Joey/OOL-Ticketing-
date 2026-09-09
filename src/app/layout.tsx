@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Montserrat } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
+import { ResaleProvider } from "@/lib/resale-context";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -67,7 +68,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="bg-background text-on-surface font-[family-name:var(--font-inter)] text-sm leading-[1.4] min-h-full flex flex-col">
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider><ResaleProvider>{children}</ResaleProvider></AuthProvider>
       </body>
     </html>
   );

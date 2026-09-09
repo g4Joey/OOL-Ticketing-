@@ -5,10 +5,12 @@ import Link from "next/link";
 import { TopAppBar } from "@/components/layout/TopAppBar";
 import { Event, events as defaultEvents, formatCurrency } from "@/lib/mock-data";
 import { fetchAllEvents } from "@/lib/supabase/db";
+import { useResale } from "@/lib/resale-context";
 
 export default function AdminDashboardPage() {
   const [eventsList, setEventsList] = useState<Event[]>(defaultEvents);
   const [adminEmail] = useState("admin@vibepass.com");
+  const { listings, approveResale, declineResale, getPendingListings } = useResale();
 
   useEffect(() => {
     async function loadData() {
@@ -192,6 +194,74 @@ export default function AdminDashboardPage() {
               </div>
             ))}
           </div>
+        </section>
+
+        {/* Resale Requests Section */}
+        <section className="bg-surface-container-lowest rounded-2xl p-5 border border-outline-variant shadow-sm flex flex-col gap-3">
+          <div className="flex justify-between items-center border-b border-outline-variant/40 pb-3">
+            <h2 className="font-[family-name:var(--font-montserrat)] text-base font-bold text-on-surface flex items-center gap-2">
+              <span className="material-symbols-outlined text-[20px] text-tertiary" style={{ fontVariationSettings: "'FILL' 1" }}>sell</span>
+              Resale Requests
+            </h2>
+            <span className="text-xs font-bold text-on-surface-variant">
+              {getPendingListings().length} pending
+            </span>
+          </div>
+
+          {listings.length === 0 ? (
+            <div className="py-6 text-center">
+              <span className="material-symbols-outlined text-3xl text-on-surface-variant opacity-50 mb-1">storefront</span>
+              <p className="text-xs text-on-surface-variant">No resale requests yet</p>
+            </div>
+          ) : (
+            <div className="flex flex-col divide-y divide-outline-variant/30">
+              {listings.map((listing) => (
+                <div key={listing.id} className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded ${
+                        listing.status === 'pending' ? 'bg-tertiary-container/30 text-tertiary' :
+                        listing.status === 'approved' ? 'bg-primary-container/30 text-primary' :
+                        listing.status === 'declined' ? 'bg-error-container text-error' :
+                        'bg-surface-container text-on-surface-variant'
+                      }`}>
+                        {listing.status}
+                      </span>
+                      <span className="text-[10px] text-on-surface-variant">
+                        {new Date(listing.listedAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <p className="text-sm font-bold text-on-surface">{listing.eventTitle}</p>
+                    <p className="text-xs text-on-surface-variant">
+                      {listing.tierLabel} • Seller: {listing.sellerName} ({listing.sellerEmail})
+                    </p>
+                    <p className="text-xs font-bold text-primary mt-0.5">
+                      Asking: {formatCurrency(listing.askingPrice)} {listing.originalPrice && `(Original: ${formatCurrency(listing.originalPrice)})`}
+                    </p>
+                  </div>
+
+                  {listing.status === 'pending' && (
+                    <div className="flex items-center gap-2 pl-0 sm:pl-4">
+                      <button
+                        onClick={() => approveResale(listing.id, 'Approved by admin')}
+                        className="px-3 py-1.5 bg-primary text-on-primary rounded-lg text-xs font-bold hover:bg-on-primary-fixed-variant transition-colors active:scale-95 flex items-center gap-1"
+                      >
+                        <span className="material-symbols-outlined text-[14px]">check</span>
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => declineResale(listing.id, 'Declined by admin')}
+                        className="px-3 py-1.5 bg-error-container text-error rounded-lg text-xs font-bold hover:bg-error/10 transition-colors active:scale-95 flex items-center gap-1"
+                      >
+                        <span className="material-symbols-outlined text-[14px]">close</span>
+                        Decline
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </section>
       </main>
     </div>

@@ -32,6 +32,8 @@ export default function CreateEventAdminPage() {
     "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=80"
   );
   const [isSellingFast, setIsSellingFast] = useState(false);
+  const [isExternalListing, setIsExternalListing] = useState(false);
+  const [organizerName, setOrganizerName] = useState("");
 
   // Ticket Tiers Builder State
   const [tiers, setTiers] = useState<TierFormItem[]>([
@@ -312,6 +314,42 @@ export default function CreateEventAdminPage() {
                   </span>
                 </label>
               </div>
+
+              {/* External / Third-Party Event Toggle */}
+              <div className="flex items-center gap-2 pt-1">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={isExternalListing}
+                    onChange={(e) => setIsExternalListing(e.target.checked)}
+                    className="w-4 h-4 rounded border-outline-variant text-primary focus:ring-primary"
+                  />
+                  <span className="text-xs font-semibold text-on-surface flex items-center gap-1">
+                    <span className="material-symbols-outlined text-[16px] text-tertiary">handshake</span>
+                    <span>External / Third-Party Event</span>
+                  </span>
+                </label>
+              </div>
+
+              {/* Organizer Name (shown when external) */}
+              {isExternalListing && (
+                <div className="pl-6 pt-1">
+                  <label className="block text-[11px] font-bold uppercase text-on-surface-variant mb-1">
+                    Organizer Name *
+                  </label>
+                  <input
+                    type="text"
+                    value={organizerName}
+                    onChange={(e) => setOrganizerName(e.target.value)}
+                    placeholder="e.g. Ghana Tourism Authority"
+                    required={isExternalListing}
+                    className="w-full bg-surface border border-outline-variant rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                  />
+                  <p className="text-[10px] text-on-surface-variant mt-1">
+                    This name will be displayed as the event organizer with an &quot;External Partner&quot; badge.
+                  </p>
+                </div>
+              )}
             </section>
 
             {/* Ticket Tiers Builder */}

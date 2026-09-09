@@ -103,6 +103,33 @@ CREATE TABLE IF NOT EXISTS public.admin_logs (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- 7. RESALE LISTINGS TABLE (P2P Ticket Marketplace)
+CREATE TABLE IF NOT EXISTS public.resale_listings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  ticket_id UUID REFERENCES public.tickets(id) ON DELETE CASCADE,
+  seller_email TEXT NOT NULL,
+  seller_name TEXT NOT NULL,
+  event_id TEXT REFERENCES public.events(id) ON DELETE SET NULL,
+  event_title TEXT NOT NULL,
+  event_date TEXT,
+  venue TEXT,
+  tier_label TEXT NOT NULL,
+  original_price NUMERIC(10, 2),
+  asking_price NUMERIC(10, 2) NOT NULL,
+  currency TEXT NOT NULL DEFAULT 'GHS',
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'declined', 'sold')),
+  admin_notes TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 8. ADD EXTERNAL EVENT COLUMNS (idempotent)
+DO $$ BEGIN
+  ALTER TABLE public.events ADD COLUMN IF NOT EXISTS is_external_listing BOOLEAN DEFAULT FALSE;
+  ALTER TABLE public.events ADD COLUMN IF NOT EXISTS organizer_name TEXT;
+EXCEPTION WHEN OTHERS THEN NULL;
+END $$;
+
 -- ==============================================================================
 -- ROW LEVEL SECURITY (RLS) POLICIES
 -- ==============================================================================
@@ -112,6 +139,7 @@ ALTER TABLE public.ticket_tiers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.tickets ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.admin_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.resale_listings ENABLE ROW LEVEL SECURITY;
 
 -- Drop existing policies if any to avoid collision
 DROP POLICY IF EXISTS "Public can view all events" ON public.events;
@@ -152,6 +180,14 @@ CREATE POLICY "Public can create tickets" ON public.tickets FOR INSERT WITH CHEC
 
 CREATE POLICY "Public can view admin logs" ON public.admin_logs FOR SELECT USING (true);
 CREATE POLICY "Public can insert admin logs" ON public.admin_logs FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Public can view resale listings" ON public.resale_listings;
+DROP POLICY IF EXISTS "Public can insert resale listings" ON public.resale_listings;
+DROP POLICY IF EXISTS "Public can update resale listings" ON public.resale_listings;
+
+CREATE POLICY "Public can view resale listings" ON public.resale_listings FOR SELECT USING (true);
+CREATE POLICY "Public can insert resale listings" ON public.resale_listings FOR INSERT WITH CHECK (true);
+CREATE POLICY "Public can update resale listings" ON public.resale_listings FOR UPDATE USING (true);
 
 -- ==============================================================================
 -- SEED DATA (2026 EVENTS & TIERS)
