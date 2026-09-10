@@ -1,6 +1,9 @@
 
 
 -- 1. PROFILES TABLE
+-- Super Admin Setup: To make yourself (or any user) a super_admin, run:
+--   UPDATE public.profiles SET role = 'super_admin' WHERE email = 'your-email@example.com';
+-- The app will detect super_admin role and grant full platform control.
 CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID UNIQUE,
@@ -8,7 +11,8 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   email TEXT NOT NULL UNIQUE,
   phone TEXT,
   avatar_url TEXT,
-  role TEXT DEFAULT 'attendee' CHECK (role IN ('attendee', 'admin', 'organizer')),
+  role TEXT DEFAULT 'attendee' CHECK (role IN ('attendee', 'admin', 'organizer', 'super_admin')),
+  password_hash TEXT, -- In production, use bcrypt or Supabase Auth. Stored as plaintext for MVP.
   loyalty_points INTEGER DEFAULT 0,
   status TEXT DEFAULT 'member' CHECK (status IN ('member', 'insider', 'vip')),
   created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -123,6 +127,20 @@ CREATE TABLE IF NOT EXISTS public.resale_listings (
 DO $$ BEGIN
   ALTER TABLE public.events ADD COLUMN IF NOT EXISTS is_external_listing BOOLEAN DEFAULT FALSE;
   ALTER TABLE public.events ADD COLUMN IF NOT EXISTS organizer_name TEXT;
+EXCEPTION WHEN OTHERS THEN NULL;
+END $$;
+
+-- 9. ADD PASSWORD & SUPER_ADMIN MIGRATION (idempotent)
+DO $$ BEGIN
+  ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS password_hash TEXT;
+EXCEPTION WHEN OTHERS THEN NULL;
+END $$;
+
+-- Update role constraint to include super_admin (idempotent)
+DO $$ BEGIN
+  ALTER TABLE public.profiles DROP CONSTRAINT IF EXISTS profiles_role_check;
+  ALTER TABLE public.profiles ADD CONSTRAINT profiles_role_check
+    CHECK (role IN ('attendee', 'admin', 'organizer', 'super_admin'));
 EXCEPTION WHEN OTHERS THEN NULL;
 END $$;
 

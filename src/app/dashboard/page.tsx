@@ -9,7 +9,7 @@ import { currentUser, activeTickets } from "@/lib/mock-data";
 import { useAuth } from "@/lib/auth-context";
 
 export default function UserDashboardPage() {
-  const { user: authUser, isAuthenticated, logout } = useAuth();
+  const { user: authUser, isAuthenticated, isAdmin, logout } = useAuth();
   const [user, setUser] = useState(currentUser);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
@@ -194,6 +194,7 @@ export default function UserDashboardPage() {
         {/* Settings List */}
         <section className="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant overflow-hidden mt-1">
           <ul className="flex flex-col divide-y divide-outline-variant/30 text-xs">
+            {isAdmin && (
             <li>
               <Link
                 href="/admin"
@@ -215,6 +216,7 @@ export default function UserDashboardPage() {
                 </span>
               </Link>
             </li>
+            )}
             <li>
               <button
                 onClick={() => showToast("Account settings opened")}

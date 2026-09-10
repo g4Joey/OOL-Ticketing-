@@ -1,15 +1,12 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
 import { TopAppBar } from "@/components/layout/TopAppBar";
 import { BottomNavBar } from "@/components/layout/BottomNavBar";
 import { CategoryChip } from "@/components/ui/CategoryChip";
 import { EventCard } from "@/components/ui/EventCard";
-import { Event, events as defaultEvents, categoryIcons, categoryLabels } from "@/lib/mock-data";
+import { Event, events as defaultEvents, categoryIcons } from "@/lib/mock-data";
 import { fetchAllEvents } from "@/lib/supabase/db";
-import { useAuth } from "@/lib/auth-context";
-import { WelcomePage } from "@/components/WelcomePage";
 const categories = [
   { id: "all", label: "All Events", icon: "confirmation_number" },
   { id: "music", label: "Music Festival", icon: categoryIcons.music },
@@ -20,31 +17,9 @@ const categories = [
 ];
 
 function DiscoveryHubContent() {
-  const { isAuthenticated } = useAuth();
-  const searchParams = useSearchParams();
-  const isBrowsing = searchParams.get("browsing") === "true";
-
   const [allEvents, setAllEvents] = useState<Event[]>(defaultEvents);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [mounted, setMounted] = useState(false);
-  const [skipWelcome, setSkipWelcome] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    // Check if user previously chose to browse
-    if (typeof window !== "undefined") {
-      const browsed = sessionStorage.getItem("vibepass_browsing");
-      if (browsed === "true") setSkipWelcome(true);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (isBrowsing && typeof window !== "undefined") {
-      sessionStorage.setItem("vibepass_browsing", "true");
-      setSkipWelcome(true);
-    }
-  }, [isBrowsing]);
 
   useEffect(() => {
     async function loadData() {
@@ -72,11 +47,6 @@ function DiscoveryHubContent() {
       return matchesCategory && matchesSearch;
     });
   }, [allEvents, selectedCategory, searchQuery]);
-
-  // Show welcome page for unauthenticated, first-time visitors
-  if (mounted && !isAuthenticated && !skipWelcome) {
-    return <WelcomePage />;
-  }
 
   return (
     <div className="bg-background text-on-background min-h-screen flex flex-col pb-24 md:pb-8 pt-16 selection:bg-primary-container selection:text-on-primary-container">
@@ -212,9 +182,5 @@ function DiscoveryHubContent() {
 }
 
 export default function DiscoveryHubPage() {
-  return (
-    <Suspense fallback={<div className="min-h-screen bg-background" />}>
-      <DiscoveryHubContent />
-    </Suspense>
-  );
+  return <DiscoveryHubContent />;
 }
